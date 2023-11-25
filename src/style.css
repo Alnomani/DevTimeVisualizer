@@ -1,0 +1,74 @@
+:root {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    color-scheme: light dark;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #242424;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+    margin: 0;
+    height: 100%;
+}
+
+#c {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Visit https://lil-gui.georgealways.com/examples/kitchen-sink/ to demo the variables */
+.lil-gui {
+    /* --background-color: #1f1f1f; */
+    /* --text-color: #ebebeb; */
+    /* --title-background-color: #111111; */
+    /* --title-text-color: #ebebeb; */
+    /* --widget-color: #424242; */
+    /* --hover-color: #4f4f4f; */
+    /* --focus-color: #595959; */
+    /* --number-color: #2cc9ff; */
+    /* --string-color: #a2db3c; */
+
+    --font-size: 0.7rem;
+    /* --width: 20%; */
+    /* --input-font-size: 0.7rem; */
+    /* --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; */
+    /* --font-family-mono: Menlo, Monaco, Consolas, "Droid Sans Mono", monospace;  */
+
+    /* --padding: 4px; */
+    /* --spacing: 4px; */
+    /* --widget-height: 100%; */
+    /* 20px */
+    /* --title-height: calc(var(--widget-height) + var(--spacing) * 1.25) */
+    /* --name-width: 45%; */
+    /* --slider-knob-width: 2px; */
+    /* --slider-input-width: 27%; */
+    /* --color-input-width: 27%; */
+    /* --slider-input-min-width: 45px; */
+    /* --color-input-min-width: 45px; */
+    /* --folder-indent: 7px; */
+    /* --widget-padding: 0 0 0 3px; */
+    /* --widget-border-radius: 2px; */
+    /* --checkbox-size: calc(0.75 * var(--widget-height)) */
+    /* --scrollbar-width: 5px; */
+}
+
+/* GUI Formula area around button */
+.lil-gui .controller.disabled {
+    opacity: 1 !important;
+}
+
+/* GUI Formula button itself*/
+.lil-gui .controller.disabled button {
+    background-color: #1f1f1f;
+    color: antiquewhite;
+    /* text-align: left; */
+}
