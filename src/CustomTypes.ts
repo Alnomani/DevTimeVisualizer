@@ -8,8 +8,8 @@ export type TextSettings = {
     rotationVector: Vector3;
 };
 export type LineSettings = {
-    sourceVector3: Vector3;
-    destinationVector3: Vector3;
+    fromVector3: Vector3;
+    toVector3: Vector3;
     hexColor: number;
     lineWidth: number;
     renderOrder: number;

@@ -1,7 +1,7 @@
 Demo over here:
 https://alnomani.github.io/DevTimeVisualizer/
 
-Made with three.js
+Made with three.js, I used typescript and vite as a bundler.
 
 **How to run:**
 

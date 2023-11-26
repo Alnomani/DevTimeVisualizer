@@ -12,6 +12,7 @@ export default class Graph3D {
     private gridLineColor: number = 0xd0d0d0;
     private standardFontSize: number = 0.1;
     private boldFontSize: number = 0.11;
+    private markerLength: number = 0.03;
     private gridLineWidth: number;
     private axisSettings: AxisSettings;
     private scene: Scene;
@@ -38,8 +39,8 @@ export default class Graph3D {
     private drawXAxisMainLine(): void {
         const { xAxisLength } = this.axisSettings;
         this.drawLine({
-            sourceVector3: [0, 0, 0],
-            destinationVector3: [xAxisLength, 0, 0],
+            fromVector3: [0, 0, 0],
+            toVector3: [xAxisLength, 0, 0],
             hexColor: colors.blue,
             lineWidth: this.axisLineWidth,
             renderOrder: 0,
@@ -49,8 +50,8 @@ export default class Graph3D {
     private drawYAxisMainLine(): void {
         const { zAxisLength } = this.axisSettings;
         this.drawLine({
-            sourceVector3: [0, 0, 0],
-            destinationVector3: [0, 0, -zAxisLength],
+            fromVector3: [0, 0, 0],
+            toVector3: [0, 0, -zAxisLength],
             hexColor: colors.red,
             lineWidth: this.axisLineWidth,
             renderOrder: 0,
@@ -60,8 +61,8 @@ export default class Graph3D {
     private drawZAxisMainLine(): void {
         const { yAxisLength } = this.axisSettings;
         this.drawLine({
-            sourceVector3: [0, 0, 0],
-            destinationVector3: [0, yAxisLength, 0],
+            fromVector3: [0, 0, 0],
+            toVector3: [0, yAxisLength, 0],
             hexColor: colors.green,
             lineWidth: this.axisLineWidth,
             renderOrder: 0,
@@ -105,10 +106,9 @@ export default class Graph3D {
     }
 
     private drawAxisMarkers(): void {
-        const markerLength: number = 0.03;
-        this.drawZAxisTextNMarker(markerLength);
-        this.drawYAxisTextNMarker(markerLength);
-        this.drawXAxisTextNMarker(markerLength);
+        this.drawZAxisTextNMarker();
+        this.drawYAxisTextNMarker();
+        this.drawXAxisTextNMarker();
     }
 
     private drawGridLines(): void {
@@ -121,170 +121,213 @@ export default class Graph3D {
     private drawXAxisGridLines(interval: number): void {
         const { xAxisLength, yAxisLength, zAxisLength } = this.axisSettings;
         for (let i = interval; i <= xAxisLength; i += interval) {
-            this.drawLine({
-                sourceVector3: [i, 0, 0],
-                destinationVector3: [i, yAxisLength, 0],
-                hexColor: this.gridLineColor,
-                lineWidth: this.gridLineWidth,
-                renderOrder: -1,
-            });
-            this.drawLine({
-                sourceVector3: [i, 0, 0],
-                destinationVector3: [i, 0, -zAxisLength],
-                hexColor: this.gridLineColor,
-                lineWidth: this.gridLineWidth,
-                renderOrder: -1,
-            });
+            this.drawXtoYGridLine(i, yAxisLength);
+            this.drawXToZGridline(i, zAxisLength);
         }
+    }
+
+    private drawXToZGridline(i: number, zAxisLength: number) {
+        this.drawLine({
+            fromVector3: [i, 0, 0],
+            toVector3: [i, 0, -zAxisLength],
+            hexColor: this.gridLineColor,
+            lineWidth: this.gridLineWidth,
+            renderOrder: -1,
+        });
+    }
+
+    private drawXtoYGridLine(i: number, yAxisLength: number) {
+        this.drawLine({
+            fromVector3: [i, 0, 0],
+            toVector3: [i, yAxisLength, 0],
+            hexColor: this.gridLineColor,
+            lineWidth: this.gridLineWidth,
+            renderOrder: -1,
+        });
     }
 
     private drawYAxisGridLines(interval: number): void {
         const { xAxisLength, zAxisLength } = this.axisSettings;
         for (let i = interval; i <= zAxisLength; i += interval) {
-            this.drawLine({
-                sourceVector3: [0, i, 0],
-                destinationVector3: [xAxisLength, i, 0],
-                hexColor: this.gridLineColor,
-                lineWidth: this.gridLineWidth,
-                renderOrder: -1,
-            });
-            this.drawLine({
-                sourceVector3: [0, i, 0],
-                destinationVector3: [0, i, -zAxisLength],
-                hexColor: this.gridLineColor,
-                lineWidth: this.gridLineWidth,
-                renderOrder: -1,
-            });
+            this.drawYtoXGridLine(i, xAxisLength);
+            this.drawYToZGridLine(i, zAxisLength);
         }
+    }
+
+    private drawYtoXGridLine(i: number, xAxisLength: number) {
+        this.drawLine({
+            fromVector3: [0, i, 0],
+            toVector3: [xAxisLength, i, 0],
+            hexColor: this.gridLineColor,
+            lineWidth: this.gridLineWidth,
+            renderOrder: -1,
+        });
+    }
+
+    private drawYToZGridLine(i: number, zAxisLength: number) {
+        this.drawLine({
+            fromVector3: [0, i, 0],
+            toVector3: [0, i, -zAxisLength],
+            hexColor: this.gridLineColor,
+            lineWidth: this.gridLineWidth,
+            renderOrder: -1,
+        });
     }
 
     private drawZAxisGridLines(interval: number): void {
         const { xAxisLength, yAxisLength, zAxisLength } = this.axisSettings;
         for (let i = interval; i <= zAxisLength; i += interval) {
-            this.drawLine({
-                sourceVector3: [0, 0, -i],
-                destinationVector3: [xAxisLength, 0, -i],
-                hexColor: this.gridLineColor,
-                lineWidth: this.gridLineWidth,
-                renderOrder: -1,
-            });
-            this.drawLine({
-                sourceVector3: [0, 0, -i],
-                destinationVector3: [0, yAxisLength, -i],
-                hexColor: this.gridLineColor,
-                lineWidth: this.gridLineWidth,
-                renderOrder: -1,
-            });
+            this.drawZtoXGridLine(i, xAxisLength);
+            this.drawZtoYGridline(i, yAxisLength);
         }
     }
 
-    private drawXAxisTextNMarker(markerLength: number): void {
+    private drawZtoXGridLine(i: number, xAxisLength: number) {
+        this.drawLine({
+            fromVector3: [0, 0, -i],
+            toVector3: [xAxisLength, 0, -i],
+            hexColor: this.gridLineColor,
+            lineWidth: this.gridLineWidth,
+            renderOrder: -1,
+        });
+    }
+
+    private drawZtoYGridline(i: number, yAxisLength: number) {
+        this.drawLine({
+            fromVector3: [0, 0, -i],
+            toVector3: [0, yAxisLength, -i],
+            hexColor: this.gridLineColor,
+            lineWidth: this.gridLineWidth,
+            renderOrder: -1,
+        });
+    }
+
+    private drawXAxisTextNMarker(): void {
         const { xAxisLength, desiredXAxis } = this.axisSettings;
         const interval: number = xAxisLength / 10;
         const realXInterval: number = desiredXAxis / 10;
         let realX: number = 0;
         for (let i = 0; i <= xAxisLength; i += interval) {
-            this.drawLine({
-                sourceVector3: [i, -markerLength, 0],
-                destinationVector3: [i, 0, 0],
-                hexColor: colors.blue,
-                lineWidth: this.axisLineWidth,
-                renderOrder: 0,
-            });
-            this.drawText({
-                location: [i, -markerLength, 0],
-                text: realX.toString(),
-                anchor: "center",
-                fontSize: this.standardFontSize,
-                fontWeight: "normal",
-                rotationVector: [0, Math.PI, 0],
-            });
+            this.drawXAxisMarker(i);
+            this.drawXAxisIncrementText(i, realX);
             realX += realXInterval;
         }
     }
 
-    private drawYAxisTextNMarker(markerLength: number): void {
+    private drawXAxisMarker(i: number) {
+        this.drawLine({
+            fromVector3: [i, -this.markerLength, 0],
+            toVector3: [i, 0, 0],
+            hexColor: colors.blue,
+            lineWidth: this.axisLineWidth,
+            renderOrder: 0,
+        });
+    }
+
+    private drawXAxisIncrementText(i: number, realX: number) {
+        this.drawText({
+            location: [i, -this.markerLength, 0],
+            text: realX.toString(),
+            anchor: "center",
+            fontSize: this.standardFontSize,
+            fontWeight: "normal",
+            rotationVector: [0, Math.PI, 0],
+        });
+    }
+
+    private drawYAxisTextNMarker(): void {
         const { yAxisLength, desiredYAxis } = this.axisSettings;
         const interval: number = yAxisLength / 10;
         const realYInterval: number = desiredYAxis / 10;
         let realY: number = 0;
         for (let i = 0; i <= yAxisLength; i += interval) {
-            this.drawLine({
-                sourceVector3: [-markerLength, i, 0],
-                destinationVector3: [0, i, 0],
-                hexColor: colors.green,
-                lineWidth: this.axisLineWidth,
-                renderOrder: 0,
-            });
-            this.drawText({
-                location: [-markerLength - 0.12, i + 0.05, 0],
-                text: realY.toString(),
-                anchor: "center",
-                fontSize: this.standardFontSize,
-                fontWeight: "normal",
-                rotationVector: [0, Math.PI - Math.PI / 4, 0],
-            });
+            this.drawYAxisMarker(i);
+            this.drawYAxisIncrementText(i, realY);
             realY += realYInterval;
         }
     }
 
-    private drawZAxisTextNMarker(markerLength: number): void {
+    private drawYAxisMarker(i: number) {
+        this.drawLine({
+            fromVector3: [-this.markerLength, i, 0],
+            toVector3: [0, i, 0],
+            hexColor: colors.green,
+            lineWidth: this.axisLineWidth,
+            renderOrder: 0,
+        });
+    }
+
+    private drawYAxisIncrementText(i: number, realY: number) {
+        this.drawText({
+            location: [-this.markerLength - 0.12, i + 0.05, 0],
+            text: realY.toString(),
+            anchor: "center",
+            fontSize: this.standardFontSize,
+            fontWeight: "normal",
+            rotationVector: [0, Math.PI - Math.PI / 4, 0],
+        });
+    }
+
+    private drawZAxisTextNMarker(): void {
         const { zAxisLength, desiredZAxis } = this.axisSettings;
         const interval: number = zAxisLength / 10;
         const realZInterval: number = desiredZAxis / 10;
         let realZ: number = realZInterval;
         for (let i = interval; i <= zAxisLength; i += interval) {
-            this.drawLine({
-                sourceVector3: [0, -markerLength, -i],
-                destinationVector3: [0, 0, -i],
-                hexColor: colors.red,
-                lineWidth: this.axisLineWidth,
-                renderOrder: 0,
-            });
-            this.drawText({
-                location: [0, -markerLength, -i],
-                text: realZ.toString(),
-                anchor: "center",
-                fontSize: this.standardFontSize,
-                fontWeight: "normal",
-                rotationVector: [0, Math.PI / 2, 0],
-            });
+            this.drawZAxisMarker(i);
+            this.drawZAxisIncrementText(i, realZ);
             realZ += realZInterval;
         }
+    }
+
+    private drawZAxisMarker(i: number) {
+        this.drawLine({
+            fromVector3: [0, -this.markerLength, -i],
+            toVector3: [0, 0, -i],
+            hexColor: colors.red,
+            lineWidth: this.axisLineWidth,
+            renderOrder: 0,
+        });
+    }
+
+    private drawZAxisIncrementText(i: number, realZ: number) {
+        this.drawText({
+            location: [0, -this.markerLength, -i],
+            text: realZ.toString(),
+            anchor: "center",
+            fontSize: this.standardFontSize,
+            fontWeight: "normal",
+            rotationVector: [0, Math.PI / 2, 0],
+        });
     }
 
     private drawText(textSettings: TextSettings): void {
         const { location, text, anchor, fontSize, fontWeight, rotationVector } =
             textSettings;
-        const myText = new Text(text);
-        myText.text = text;
-        myText.fontSize = fontSize;
-        myText.position.set(location[0], location[1], location[2]);
-        myText.color = colors.black;
-        myText.anchorX = anchor;
-        myText.anchorY = "center";
-        myText.renderOrder = 1;
-        myText.material.depthTest = false;
-        myText.fontWeight = fontWeight;
-        myText.rotation.set(
+        const textObj = new Text(text);
+        textObj.text = text;
+        textObj.fontSize = fontSize;
+        textObj.position.set(location[0], location[1], location[2]);
+        textObj.color = colors.black;
+        textObj.anchorX = anchor;
+        textObj.anchorY = "center";
+        textObj.renderOrder = 1;
+        textObj.material.depthTest = false;
+        textObj.fontWeight = fontWeight;
+        textObj.rotation.set(
             rotationVector[0],
             rotationVector[1],
             rotationVector[2]
         );
-        this.scene.add(myText);
-        myText.sync();
+        this.scene.add(textObj);
+        textObj.sync();
     }
 
     private drawLine(lineSettings: LineSettings): void {
-        const {
-            sourceVector3,
-            destinationVector3,
-            hexColor,
-            lineWidth,
-            renderOrder,
-        } = lineSettings;
+        const { fromVector3, toVector3, hexColor, lineWidth, renderOrder } =
+            lineSettings;
         const lineGeo = new LineGeometry();
-        lineGeo.setPositions([...sourceVector3, ...destinationVector3]);
+        lineGeo.setPositions([...fromVector3, ...toVector3]);
         const line_material = new LineMaterial({
             linewidth: lineWidth,
             color: hexColor,
