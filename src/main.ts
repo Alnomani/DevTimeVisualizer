@@ -1,79 +1,63 @@
-import "./style.css";
 import * as THREE from "three";
-import GUI, { Controller } from "lil-gui";
-import * as colors from "./ColorConstants.ts";
-import { TextSettings, LineSettings, Vector3, GeoType } from "./CustomTypes.ts";
-
-// Types not working correcly.
-import { Text } from "troika-three-text";
-
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { Line2 } from "three/addons/lines/Line2.js";
-import { LineMaterial } from "three/addons/lines/LineMaterial.js";
-import { LineGeometry } from "three/addons/lines/LineGeometry.js";
+import GUI, { Controller } from "lil-gui";
+
+import "./style.css";
+import * as colors from "./ColorConstants.ts";
+import { Vector3, GeoType, AxisSettings } from "./CustomTypes.ts";
+import Graph3D from "./Graph3D.ts";
 
 const showDebugGUI: boolean = true;
-
-const axisLineWidth: number = 0.005;
-const gridLineWidth: number = axisLineWidth / 10;
-const gridLineColor: number = 0xd0d0d0;
-const standardFontSize: number = 0.1;
-
-// In world units
-const xAxisLength: number = 2.5;
-const yAxisLength: number = 2.1;
-const zAxisLength: number = 2.1;
 const zFightingConstant = 0.01;
 
-const desiredXAxis: number = 200;
-const desiredYAxis: number = 20;
-const desiredZAxis: number = 20;
+// Axis length is in world units
+const axisInfo: AxisSettings = {
+    xAxisLength: 2.5,
+    yAxisLength: 2.1,
+    zAxisLength: 2.1,
+    desiredXAxis: 200,
+    desiredYAxis: 20,
+    desiredZAxis: 20,
+};
 
 const guiSettings = {
-    boxInputWidth: Math.round(desiredXAxis / xAxisLength),
-    boxInputHeight: Math.round(desiredYAxis / yAxisLength),
-    boxInputDepth: Math.round(desiredZAxis / zAxisLength),
+    boxInputWidth: Math.round(axisInfo.desiredXAxis / axisInfo.xAxisLength),
+    boxInputHeight: Math.round(axisInfo.desiredYAxis / axisInfo.yAxisLength),
+    boxInputDepth: Math.round(axisInfo.desiredZAxis / axisInfo.zAxisLength),
     members: 5,
     formula: "",
     boxOpacity: 0.6,
     debug: displayCameraInfo,
-    formulaDisplay: emptyFunction,
+    formulaDisplay: () => {},
     toggleOrbitButton: toggleOrbitControls,
 };
 
 let formulaController: Controller | null = null;
-
-function emptyFunction() {}
 updateFormula();
 
-// fov, aspect, near, far
-const fov: number = 20;
-const aspectRatio: number = window.innerWidth / window.innerHeight;
-const near = 0.1;
-const far = 1000;
-
 const scene: THREE.Scene = new THREE.Scene();
+scene.background = new THREE.Color(colors.white);
+
 const canvas = <HTMLCanvasElement>document.querySelector("#c");
 const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
+
+const fov: number = 20;
+const aspectRatio: number = canvas.clientWidth / canvas.clientHeight;
+const near = 0.1;
+const far = 1000;
 const camera = new THREE.PerspectiveCamera(fov, aspectRatio, near, far);
-camera.aspect = canvas.clientWidth / canvas.clientHeight;
-camera.updateProjectionMatrix();
+camera.position.set(7.3, 5.3, -8.3);
+camera.rotation.set(-2.58, 0.64, 2.78);
+
 const controls = new OrbitControls(camera, canvas);
 controls.update();
 controls.enabled = false;
 
-scene.background = new THREE.Color(colors.white);
-
-// Current camera angle
-camera.position.set(7.3, 5.3, -8.3);
-camera.rotation.set(-2.58, 0.64, 2.78);
-
-displayCameraInfo();
 setupGui();
 
 const boxComponents = createBoxGeometry();
 const boxOutline = createBoxOutline();
-let boldFontSize = 0.11;
+
 adjustForRoundingErrors();
 
 addAllElementsToScene();
@@ -89,18 +73,6 @@ function adjustForRoundingErrors() {
     updateBoxDepth();
 }
 
-function getWorldUnitWidth(): number {
-    return (xAxisLength / desiredXAxis) * guiSettings.boxInputWidth;
-}
-
-function getWorldUnitHeight(): number {
-    return (yAxisLength / desiredYAxis) * guiSettings.boxInputHeight;
-}
-
-function getWorldUnitDepth(): number {
-    return -1 * (zAxisLength / desiredZAxis) * guiSettings.boxInputDepth;
-}
-
 function addAllElementsToScene() {
     scene.add(boxOutline);
     boxComponents.forEach((side) => {
@@ -110,98 +82,8 @@ function addAllElementsToScene() {
     addLightAtVector3([-1, 2, 4]);
     addLightAtVector3([1, -1, -2]);
 
-    drawZAxisMainLine();
-    drawYAxisMainLine();
-    drawXAxisMainLine();
-
-    drawXAxisLabelText();
-    drawZAxisLabelText();
-    drawYAxisLabelText();
-
-    drawAxisMarkers();
-    drawGridLines();
-}
-
-function drawXAxisMainLine() {
-    drawLine({
-        sourceVector3: [0, 0, 0],
-        destinationVector3: [xAxisLength, 0, 0],
-        hexColor: colors.blue,
-        lineWidth: axisLineWidth,
-        renderOrder: 0,
-    });
-}
-
-function drawYAxisMainLine() {
-    drawLine({
-        sourceVector3: [0, 0, 0],
-        destinationVector3: [0, 0, -zAxisLength],
-        hexColor: colors.red,
-        lineWidth: axisLineWidth,
-        renderOrder: 0,
-    });
-}
-
-function drawZAxisMainLine() {
-    drawLine({
-        sourceVector3: [0, 0, 0],
-        destinationVector3: [0, yAxisLength, 0],
-        hexColor: colors.green,
-        lineWidth: axisLineWidth,
-        renderOrder: 0,
-    });
-}
-
-function drawYAxisLabelText() {
-    drawText({
-        location: [0.21, yAxisLength / 2, 0],
-        text: "Features",
-        anchor: "center",
-        fontSize: boldFontSize,
-        fontWeight: "bold",
-        rotationVector: [0, Math.PI, Math.PI / 2],
-    });
-}
-
-function drawZAxisLabelText() {
-    drawText({
-        location: [0, 0.21, -zAxisLength / 2],
-        text: "Unexplored",
-        anchor: "center",
-        fontSize: boldFontSize,
-        fontWeight: "bold",
-        rotationVector: [0, Math.PI / 2, 0],
-    });
-}
-
-function drawXAxisLabelText() {
-    drawText({
-        location: [xAxisLength / 2, 0.21, 0],
-        text: "Content",
-        anchor: "center",
-        fontSize: boldFontSize,
-        fontWeight: "bold",
-        rotationVector: [0, Math.PI, 0],
-    });
-}
-
-function displayCameraInfo() {
-    console.log("===================================");
-    let vector = new THREE.Vector3(0, 0, -1);
-    vector.applyQuaternion(camera.quaternion);
-
-    let infoString = "";
-    infoString += displayVector("Camera Position", camera.position);
-    infoString += displayVector("Lookat", vector);
-    infoString += displayVector("Cam Rotation", camera.rotation);
-    console.log(infoString);
-}
-
-function displayVector(label: string, vector: THREE.Vector3 | THREE.Euler) {
-    let { x, y, z } = vector;
-    const displayString =
-        label + `: ${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)}\n`;
-    return displayString;
+    const mainGraph: Graph3D = new Graph3D(scene, axisInfo);
+    mainGraph.draw();
 }
 
 function updateFormula() {
@@ -264,6 +146,7 @@ function setupGui() {
 
 function setupDevVariablesGui(gui: GUI) {
     // Slider starting from 5 to desiredXAxis, with 5 step increments
+    const { desiredXAxis, desiredYAxis, desiredZAxis } = axisInfo;
     gui.add(guiSettings, "boxInputWidth", 5, desiredXAxis, 5)
         .name("Content")
         .onChange(updateBoxWidth);
@@ -372,189 +255,19 @@ function addLightAtVector3(loc: Vector3) {
     scene.add(light);
 }
 
-function drawAxisMarkers() {
-    const markerLength: number = 0.03;
-    drawZAxisTextNMarker(markerLength);
-    drawYAxisTextNMarker(markerLength);
-    drawXAxisTextNMarker(markerLength);
+function getWorldUnitWidth(): number {
+    const { xAxisLength, desiredXAxis } = axisInfo;
+    return (xAxisLength / desiredXAxis) * guiSettings.boxInputWidth;
 }
 
-function drawGridLines() {
-    drawXAxisGridLines(xAxisLength / 10);
-    drawYAxisGridLines(yAxisLength / 10);
-    drawZAxisGridLines(zAxisLength / 10);
+function getWorldUnitHeight(): number {
+    const { yAxisLength, desiredYAxis } = axisInfo;
+    return (yAxisLength / desiredYAxis) * guiSettings.boxInputHeight;
 }
 
-function drawXAxisGridLines(interval: number) {
-    for (let i = interval; i <= xAxisLength; i += interval) {
-        drawLine({
-            sourceVector3: [i, 0, 0],
-            destinationVector3: [i, yAxisLength, 0],
-            hexColor: gridLineColor,
-            lineWidth: gridLineWidth,
-            renderOrder: -1,
-        });
-        drawLine({
-            sourceVector3: [i, 0, 0],
-            destinationVector3: [i, 0, -zAxisLength],
-            hexColor: gridLineColor,
-            lineWidth: gridLineWidth,
-            renderOrder: -1,
-        });
-    }
-}
-
-function drawYAxisGridLines(interval: number) {
-    for (let i = interval; i <= zAxisLength; i += interval) {
-        drawLine({
-            sourceVector3: [0, i, 0],
-            destinationVector3: [xAxisLength, i, 0],
-            hexColor: gridLineColor,
-            lineWidth: gridLineWidth,
-            renderOrder: -1,
-        });
-        drawLine({
-            sourceVector3: [0, i, 0],
-            destinationVector3: [0, i, -zAxisLength],
-            hexColor: gridLineColor,
-            lineWidth: gridLineWidth,
-            renderOrder: -1,
-        });
-    }
-}
-
-function drawZAxisGridLines(interval: number) {
-    for (let i = interval; i <= zAxisLength; i += interval) {
-        drawLine({
-            sourceVector3: [0, 0, -i],
-            destinationVector3: [xAxisLength, 0, -i],
-            hexColor: gridLineColor,
-            lineWidth: gridLineWidth,
-            renderOrder: -1,
-        });
-        drawLine({
-            sourceVector3: [0, 0, -i],
-            destinationVector3: [0, yAxisLength, -i],
-            hexColor: gridLineColor,
-            lineWidth: gridLineWidth,
-            renderOrder: -1,
-        });
-    }
-}
-
-function drawXAxisTextNMarker(markerLength: number) {
-    const interval: number = xAxisLength / 10;
-    const realXInterval: number = desiredXAxis / 10;
-    let realX: number = 0;
-    for (let i = 0; i <= xAxisLength; i += interval) {
-        drawLine({
-            sourceVector3: [i, -markerLength, 0],
-            destinationVector3: [i, 0, 0],
-            hexColor: colors.blue,
-            lineWidth: axisLineWidth,
-            renderOrder: 0,
-        });
-        drawText({
-            location: [i, -markerLength, 0],
-            text: realX.toString(),
-            anchor: "center",
-            fontSize: standardFontSize,
-            fontWeight: "normal",
-            rotationVector: [0, Math.PI, 0],
-        });
-        realX += realXInterval;
-    }
-}
-
-function drawYAxisTextNMarker(markerLength: number) {
-    const interval: number = yAxisLength / 10;
-    const realYInterval: number = desiredYAxis / 10;
-    let realY: number = 0;
-    for (let i = 0; i <= yAxisLength; i += interval) {
-        drawLine({
-            sourceVector3: [-markerLength, i, 0],
-            destinationVector3: [0, i, 0],
-            hexColor: colors.green,
-            lineWidth: axisLineWidth,
-            renderOrder: 0,
-        });
-        drawText({
-            location: [-markerLength - 0.12, i + 0.05, 0],
-            text: realY.toString(),
-            anchor: "center",
-            fontSize: standardFontSize,
-            fontWeight: "normal",
-            rotationVector: [0, Math.PI - Math.PI / 4, 0],
-        });
-        realY += realYInterval;
-    }
-}
-
-function drawZAxisTextNMarker(markerLength: number) {
-    const interval: number = zAxisLength / 10;
-    const realZInterval: number = desiredZAxis / 10;
-    let realZ: number = realZInterval;
-    for (let i = interval; i <= zAxisLength; i += interval) {
-        drawLine({
-            sourceVector3: [0, -markerLength, -i],
-            destinationVector3: [0, 0, -i],
-            hexColor: colors.red,
-            lineWidth: axisLineWidth,
-            renderOrder: 0,
-        });
-        drawText({
-            location: [0, -markerLength, -i],
-            text: realZ.toString(),
-            anchor: "center",
-            fontSize: standardFontSize,
-            fontWeight: "normal",
-            rotationVector: [0, Math.PI / 2, 0],
-        });
-        realZ += realZInterval;
-    }
-}
-
-function drawText(textSettings: TextSettings) {
-    // console.log(textSettings);
-    const { location, text, anchor, fontSize, fontWeight, rotationVector } =
-        textSettings;
-    const myText = new Text(text);
-    myText.text = text;
-    myText.fontSize = fontSize;
-    myText.position.set(location[0], location[1], location[2]);
-    myText.color = colors.black;
-    myText.anchorX = anchor;
-    myText.anchorY = "center";
-    myText.renderOrder = 1;
-    myText.material.depthTest = false;
-    myText.fontWeight = fontWeight;
-    myText.rotation.set(
-        rotationVector[0],
-        rotationVector[1],
-        rotationVector[2]
-    );
-    scene.add(myText);
-    myText.sync();
-}
-
-function drawLine(lineSettings: LineSettings) {
-    const {
-        sourceVector3,
-        destinationVector3,
-        hexColor,
-        lineWidth,
-        renderOrder,
-    } = lineSettings;
-    const lineGeo = new LineGeometry();
-    lineGeo.setPositions([...sourceVector3, ...destinationVector3]);
-    const line_material = new LineMaterial({
-        linewidth: lineWidth,
-        color: hexColor,
-        depthTest: false,
-    });
-    const line = new Line2(lineGeo, line_material);
-    line.renderOrder = renderOrder;
-    scene.add(line);
+function getWorldUnitDepth(): number {
+    const { zAxisLength, desiredZAxis } = axisInfo;
+    return -1 * (zAxisLength / desiredZAxis) * guiSettings.boxInputDepth;
 }
 
 function resizeRendererToDisplaySize() {
@@ -575,4 +288,23 @@ function animate() {
         camera.updateProjectionMatrix();
     }
     renderer.render(scene, camera);
+}
+
+function displayCameraInfo() {
+    console.log("===================================");
+    let vector = new THREE.Vector3(0, 0, -1);
+    vector.applyQuaternion(camera.quaternion);
+
+    let infoString = "";
+    infoString += displayVector("Camera Position", camera.position);
+    infoString += displayVector("Lookat", vector);
+    infoString += displayVector("Cam Rotation", camera.rotation);
+    console.log(infoString);
+}
+
+function displayVector(label: string, vector: THREE.Vector3 | THREE.Euler) {
+    let { x, y, z } = vector;
+    const displayString =
+        label + `: ${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)}\n`;
+    return displayString;
 }

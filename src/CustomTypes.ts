@@ -24,3 +24,12 @@ export type GeoType =
           THREE.EdgesGeometry<THREE.BoxGeometry>,
           THREE.LineBasicMaterial
       >;
+
+export type AxisSettings = {
+    readonly xAxisLength: number;
+    readonly yAxisLength: number;
+    readonly zAxisLength: number;
+    readonly desiredXAxis: number;
+    readonly desiredYAxis: number;
+    readonly desiredZAxis: number;
+};
