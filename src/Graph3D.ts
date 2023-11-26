@@ -85,7 +85,7 @@ export default class Graph3D {
         const { zAxisLength } = this.axisSettings;
         this.drawText({
             location: [0, 0.21, -zAxisLength / 2],
-            text: "Unexplored",
+            text: "Unexplored Territory",
             anchor: "center",
             fontSize: this.boldFontSize,
             fontWeight: "bold",

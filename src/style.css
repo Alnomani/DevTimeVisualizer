@@ -19,10 +19,15 @@ body {
     height: 100%;
 }
 
-#c {
-    width: 100%;
+#visualizerCanvas {
+    width: 30%;
     height: 100%;
     display: block;
+}
+
+#canvasParent {
+    width: 50%;
+    height: 100%;
 }
 
 /* Visit https://lil-gui.georgealways.com/examples/kitchen-sink/ to demo the variables */

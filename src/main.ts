@@ -15,7 +15,7 @@ const axisInfo: AxisSettings = {
     xAxisLength: 2.5,
     yAxisLength: 2.1,
     zAxisLength: 2.1,
-    desiredXAxis: 200,
+    desiredXAxis: 100,
     desiredYAxis: 20,
     desiredZAxis: 20,
 };
@@ -38,7 +38,7 @@ updateFormula();
 const scene: THREE.Scene = new THREE.Scene();
 scene.background = new THREE.Color(colors.white);
 
-const canvas = <HTMLCanvasElement>document.querySelector("#c");
+const canvas = <HTMLCanvasElement>document.querySelector("#visualizerCanvas");
 const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
 
 const fov: number = 20;
@@ -134,7 +134,7 @@ function updateBoxDepth() {
 
 function setupGui() {
     const gui = new GUI({
-        container: <HTMLCanvasElement>document.getElementById("app"),
+        container: <HTMLCanvasElement>document.getElementById("forms"),
         title: "Development Time Variables",
     });
     setupDevVariablesGui(gui);
@@ -147,13 +147,13 @@ function setupGui() {
 function setupDevVariablesGui(gui: GUI) {
     // Slider starting from 5 to desiredXAxis, with 5 step increments
     const { desiredXAxis, desiredYAxis, desiredZAxis } = axisInfo;
-    gui.add(guiSettings, "boxInputWidth", 5, desiredXAxis, 5)
-        .name("Content")
-        .onChange(updateBoxWidth);
-
     gui.add(guiSettings, "boxInputHeight", 1, desiredYAxis, 1)
         .name("Features")
         .onChange(updateBoxHeight);
+
+    gui.add(guiSettings, "boxInputWidth", 5, desiredXAxis, 5)
+        .name("Content")
+        .onChange(updateBoxWidth);
 
     gui.add(guiSettings, "boxInputDepth", 1, desiredZAxis, 1)
         .name("Unexplored Territory")
@@ -162,7 +162,7 @@ function setupDevVariablesGui(gui: GUI) {
     gui.add(guiSettings, "members")
         .min(1)
         .step(1)
-        .name("Members")
+        .name("Team Members")
         .onChange(updateFormula);
 
     const devFolder = gui.addFolder("Development Time");
