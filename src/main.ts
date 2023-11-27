@@ -52,8 +52,8 @@ const aspectRatio: number = canvas.clientWidth / canvas.clientHeight;
 const near = 0.1;
 const far = 1000;
 const camera = new THREE.PerspectiveCamera(fov, aspectRatio, near, far);
-camera.position.set(7.3, 5.3, -8.3);
-camera.rotation.set(-2.58, 0.64, 2.78);
+camera.position.set(8.401016624276645, 5.048890255251792, -6.828977259134645);
+camera.quaternion.set(-0.08978106831528793, 0.8832999764834034, 0.18904120482201572, 0.4195043911522562);
 
 const controls = new OrbitControls(camera, canvas);
 controls.update();
@@ -315,7 +315,7 @@ function getWorldUnitDepth(): number {
 function resizeRendererToDisplaySize() {
     const pixelRatio = window.devicePixelRatio;
     const width = (canvas.clientWidth * pixelRatio) | 0;
-    const height = (canvas.clientHeight * pixelRatio) | 0;
+    const height = (canvas.clientWidth * pixelRatio) | 0;
     const needResize = canvas.width !== width || canvas.height !== height;
     if (needResize) {
         renderer.setSize(width, height, false);
@@ -326,7 +326,7 @@ function resizeRendererToDisplaySize() {
 function animate() {
     requestAnimationFrame(animate);
     if (resizeRendererToDisplaySize()) {
-        camera.aspect = canvas.clientWidth / canvas.clientHeight;
+        camera.aspect = canvas.width / canvas.height;
         camera.updateProjectionMatrix();
     }
     renderer.render(scene, camera);
