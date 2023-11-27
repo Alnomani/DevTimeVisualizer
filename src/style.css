@@ -33,10 +33,10 @@ body {
     --title-background-color: #ffffff;
     --title-text-color: #003536;
     --widget-color: #e3e8ed;
-    /* --hover-color: #4f4f4f; */
-    /* --focus-color: #595959; */
-    --number-color: #ff6000;
-    --string-color: #ff6000;
+    --hover-color: #9fedd7;
+    --focus-color: #9fedd7;
+    --number-color: #003536;
+    --string-color: #003536;
 
     --font-size: 0.7rem;
     --width: 100%;
@@ -45,18 +45,18 @@ body {
     --font-family: "Segoe UI", Tahoma, Arial, sans-serif;
 
     /* --padding: 4px; */
-    --spacing: 10px;
-    /* 20px */
+    --spacing: 12px;
     /* --title-height: calc(var(--widget-height) + var(--spacing) * 1.25) */
     /* --name-width: 45%; */
-    /* --slider-knob-width: 2px; */
+    --slider-knob-width: 3px;
     /* --slider-input-width: 27%; */
     /* --color-input-width: 27%; */
     /* --slider-input-min-width: 45px; */
     /* --color-input-min-width: 45px; */
     /* --folder-indent: 7px; */
     /* --widget-padding: 0 0 0 3px; */
-    /* --widget-border-radius: 2px; */
+    --widget-height: 30px;
+    --widget-border-radius: 10px;
     /* --checkbox-size: calc(0.75 * var(--widget-height)) */
     /* --scrollbar-width: 5px; */
 }
@@ -68,7 +68,7 @@ body {
 
 /* GUI Formula button itself*/
 .lil-gui .controller.disabled button {
-    background-color: #1f1f1f;
-    color: antiquewhite;
+    background-color: #e3e8ed;
+    color: #ff6000;
     /* text-align: left; */
 }
