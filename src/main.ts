@@ -24,7 +24,7 @@ const guiSettings = {
     boxInputWidth: Math.round(axisInfo.desiredXAxis / axisInfo.xAxisLength),
     boxInputHeight: Math.round(axisInfo.desiredYAxis / axisInfo.yAxisLength),
     boxInputDepth: Math.round(axisInfo.desiredZAxis / axisInfo.zAxisLength),
-    members: 5,
+    members: 1,
     formula: "",
     boxOpacity: 0.6,
     debug: displayCameraInfo,
@@ -94,8 +94,8 @@ function updateFormula() {
         boxInputDepth: d,
         members,
     } = guiSettings;
-    const result: number = (w * h * d) / members / 100;
-    guiSettings.formula = `${w} x ${h} x ${d} % ${members} % 100 
+    const result: number = (w * h * (d + 1)) / members / 100;
+    guiSettings.formula = `${w} x ${h} x (${d} + 1) % ${members} % 100 
     = ${result.toFixed(2)} years`;
     if (formulaController) {
         formulaController.name(guiSettings.formula);
@@ -135,7 +135,7 @@ function updateBoxDepth() {
 function setupGui() {
     const gui = new GUI({
         container: <HTMLCanvasElement>document.getElementById("forms"),
-        title: "Development Time Variables",
+        title: "Product Scope",
     });
     setupDevVariablesGui(gui);
 
@@ -151,21 +151,22 @@ function setupDevVariablesGui(gui: GUI) {
         .name("Features")
         .onChange(updateBoxHeight);
 
-    gui.add(guiSettings, "boxInputWidth", 5, desiredXAxis, 5)
+    gui.add(guiSettings, "boxInputWidth", 5, desiredXAxis, 1)
         .name("Content")
         .onChange(updateBoxWidth);
 
-    gui.add(guiSettings, "boxInputDepth", 1, desiredZAxis, 1)
+    gui.add(guiSettings, "boxInputDepth", 0, desiredZAxis, 1)
         .name("Unexplored Territory")
         .onChange(updateBoxDepth);
 
-    gui.add(guiSettings, "members")
+    const devFolder = gui.addFolder("Project Scope");
+    
+    devFolder.add(guiSettings, "members")
         .min(1)
         .step(1)
-        .name("Team Members")
+        .name("Team Size")
         .onChange(updateFormula);
-
-    const devFolder = gui.addFolder("Development Time");
+    
     formulaController = devFolder.add(guiSettings, "formulaDisplay");
     formulaController.name(guiSettings.formula).listen().disable();
 }
@@ -267,7 +268,7 @@ function getWorldUnitHeight(): number {
 
 function getWorldUnitDepth(): number {
     const { zAxisLength, desiredZAxis } = axisInfo;
-    return -1 * (zAxisLength / desiredZAxis) * guiSettings.boxInputDepth;
+    return -1 * (zAxisLength / desiredZAxis) * (guiSettings.boxInputDepth + 1);
 }
 
 function resizeRendererToDisplaySize() {
