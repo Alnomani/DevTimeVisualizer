@@ -99,8 +99,11 @@ function updateFormula() {
     } = guiSettings;
     const result: number = (w * h * (d + 1)) / members / 100;
     guiSettings.formula = `${w} x ${h} x (${d} + 1) % ${members} % 100 
-    = <b>${result.toFixed(2)} Years</b>`;
-    guiSettings.months = `<b>${(result * 12).toFixed(0)} Months</b>`;
+    = <b>${result.toFixed(2)} Year${result > 1 ? 's' : ''}</b>`;
+
+    const monthResult: number = (result * 12);
+    const truncateMonths: boolean = monthResult > 1;
+    guiSettings.months = `<b>${truncateMonths ? monthResult.toFixed(0) : monthResult.toFixed(2)} Month${truncateMonths ? 's' : ''}</b>`;
     if (formulaController) {
         formulaController.name(guiSettings.formula);
         monthController?.name(guiSettings.months);
