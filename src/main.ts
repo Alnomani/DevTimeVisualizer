@@ -27,12 +27,15 @@ const guiSettings = {
     members: 1,
     formula: "",
     months: "",
-    boxOpacity: 0.6,
+    boxOpacity: 0.7,
     debug: displayCameraInfo,
     formulaDisplay: () => {},
     monthsDisplay: () => {},
     toggleOrbitButton: toggleOrbitControls,
 };
+
+const boxComponents = createBoxGeometry();
+const boxOutline = createBoxOutline();
 
 let formulaController: Controller | null = null;
 let monthController: Controller | null = null;
@@ -57,9 +60,6 @@ controls.update();
 controls.enabled = false;
 
 setupGui();
-
-const boxComponents = createBoxGeometry();
-const boxOutline = createBoxOutline();
 
 adjustForRoundingErrors();
 
@@ -100,6 +100,8 @@ function updateFormula() {
     const result: number = (w * h * (d + 1)) / members / 100;
     guiSettings.formula = `${w} x ${h} x (${d} + 1) % ${members} % 100 
     = <b>${result.toFixed(2)} Year${result > 1 ? 's' : ''}</b>`;
+    lerpBoxColor(result);
+
 
     const monthResult: number = (result * 12);
     const truncateMonths: boolean = monthResult > 1;
@@ -216,6 +218,34 @@ function updateBoxColor(inputVal: number) {
         (<any>side.material).color = new THREE.Color(inputVal);
     });
 }
+
+function lerpBoxColor(inputVal: number) {
+    const minYearsForOptimal = 0.8;
+    const maxYearsForDangerous = 5;
+    const lerpValue = Math.min(Math.max(inputVal, minYearsForOptimal), maxYearsForDangerous) / maxYearsForDangerous;
+
+    const lerpedColor = lerpColor(colors.green, colors.red, lerpValue);
+    //const lerpedColor = colors.black;
+    boxComponents.forEach((side) => {
+        (<any>side.material).color = new THREE.Color(lerpedColor);
+    });
+}
+
+function lerpColor(a: number, b: number, amount: number) {
+    const ar = a >> 16,
+          ag = a >> 8 & 0xff,
+          ab = a & 0xff,
+
+          br = b >> 16,
+          bg = b >> 8 & 0xff,
+          bb = b & 0xff,
+
+          rr = ar + amount * (br - ar),
+          rg = ag + amount * (bg - ag),
+          rb = ab + amount * (bb - ab);
+
+    return (rr << 16) + (rg << 8) + (rb | 0);
+};
 
 function createBoxGeometry() {
     let boxSides: THREE.Mesh[] = [];
