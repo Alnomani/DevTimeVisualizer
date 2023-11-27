@@ -7,7 +7,7 @@ import * as colors from "./ColorConstants.ts";
 import { Vector3, GeoType, AxisSettings } from "./CustomTypes.ts";
 import Graph3D from "./Graph3D.ts";
 
-const showDebugGUI: boolean = true;
+const showDebugGUI: boolean = false;
 const zFightingConstant = 0.01;
 
 // Axis length is in world units
@@ -26,13 +26,16 @@ const guiSettings = {
     boxInputDepth: Math.round(axisInfo.desiredZAxis / axisInfo.zAxisLength),
     members: 1,
     formula: "",
+    months: "",
     boxOpacity: 0.6,
     debug: displayCameraInfo,
     formulaDisplay: () => {},
+    monthsDisplay: () => {},
     toggleOrbitButton: toggleOrbitControls,
 };
 
 let formulaController: Controller | null = null;
+let monthController: Controller | null = null;
 updateFormula();
 
 const scene: THREE.Scene = new THREE.Scene();
@@ -96,9 +99,11 @@ function updateFormula() {
     } = guiSettings;
     const result: number = (w * h * (d + 1)) / members / 100;
     guiSettings.formula = `${w} x ${h} x (${d} + 1) % ${members} % 100 
-    = ${result.toFixed(2)} years`;
+    = <b>${result.toFixed(2)} Years</b>`;
+    guiSettings.months = `<b>${(result * 12).toFixed(0)} Months</b>`;
     if (formulaController) {
         formulaController.name(guiSettings.formula);
+        monthController?.name(guiSettings.months);
     }
 }
 
@@ -169,6 +174,9 @@ function setupDevVariablesGui(gui: GUI) {
     
     formulaController = devFolder.add(guiSettings, "formulaDisplay");
     formulaController.name(guiSettings.formula).listen().disable();
+
+    monthController = devFolder.add(guiSettings, "monthsDisplay");
+    monthController.name(guiSettings.months).listen().disable();
 }
 
 function setupDebugSettingsGUI(gui: GUI) {
