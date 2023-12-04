@@ -5,20 +5,20 @@ body {
 }
 
 #visualizerCanvas {
-    width: 55%;
+    width: 60%;
     height: auto;
     float: left;
     margin-top: 10px;
 }
 
 #forms {
-    width: 45%;
+    width: 40%;
     height: 100%;
     float: left;
 }
 
 #canvasParent {
-    width: 50%;
+    width: 100%;
     height: 100%;
     margin: auto;
 }
@@ -37,8 +37,8 @@ body {
 
     --font-size: 0.7rem;
     --width: 100%;
-    --font-size: 1.125rem;
-    --input-font-size: 1.125rem;
+    --font-size: 1rem;
+    --input-font-size: 1rem;
     --font-family: "Segoe UI", Tahoma, Arial, sans-serif;
 
     /* --padding: 4px; */
@@ -52,8 +52,8 @@ body {
     /* --color-input-min-width: 45px; */
     /* --folder-indent: 7px; */
     /* --widget-padding: 0 0 0 3px; */
-    --widget-height: 30px;
-    --widget-border-radius: 10px;
+    --widget-height: 28px;
+    --widget-border-radius: 8px;
     /* --checkbox-size: calc(0.75 * var(--widget-height)) */
     /* --scrollbar-width: 5px; */
 }
@@ -67,5 +67,6 @@ body {
 .lil-gui .controller.disabled button {
     background-color: #e3e8ed;
     color: #ff6000;
+    font-size:0.9rem;
     /* text-align: left; */
 }

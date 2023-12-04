@@ -98,14 +98,17 @@ function updateFormula() {
         members,
     } = guiSettings;
     const result: number = (w * h * (d + 1)) / members / 100;
-    guiSettings.formula = `${w} x ${h} x (${d} + 1) % ${members} % 100 
-    = <b>${result.toFixed(2)} Year${result > 1 ? 's' : ''}</b>`;
+    guiSettings.formula = `${w} x ${h} x (${d} + 1) % ${members} % 100 =`;
     lerpBoxColor(result);
 
 
     const monthResult: number = (result * 12);
     const truncateMonths: boolean = monthResult > 1;
-    guiSettings.months = `<b>${truncateMonths ? monthResult.toFixed(0) : monthResult.toFixed(2)} Month${truncateMonths ? 's' : ''}</b>`;
+    const yearString : string = `<b>${result.toFixed(2)} Year${result > 1 ? 's' : ''}</b> or `
+    const monthString: string = `<b>${truncateMonths ? monthResult.toFixed(0) : monthResult.toFixed(2)} Month${truncateMonths ? 's' : ''}</b>`;
+
+
+    guiSettings.months = yearString + monthString;
     if (formulaController) {
         formulaController.name(guiSettings.formula);
         monthController?.name(guiSettings.months);
@@ -161,7 +164,7 @@ function setupDevVariablesGui(gui: GUI) {
         .name("Features")
         .onChange(updateBoxHeight);
 
-    gui.add(guiSettings, "boxInputWidth", 5, desiredXAxis, 1)
+    gui.add(guiSettings, "boxInputWidth", 1, desiredXAxis, 1)
         .name("Content")
         .onChange(updateBoxWidth);
 
